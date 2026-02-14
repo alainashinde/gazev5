@@ -23,7 +23,7 @@ face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True, max_num_faces=1)
 
 cap = cv2.VideoCapture(0)
 lost_start = None
-currently_focused = True  # True = user is focused
+currently_focused = True  # true =  focused
 print('Starting Gaze eye-tracker. Press q to quit.')
 
 while True:
@@ -50,7 +50,7 @@ while True:
             display_text = f'Possibly distracted ({elapsed:.1f}s)'
 
             if elapsed >= LOST_FOCUS_SECONDS and currently_focused:
-                # Only log once per eyes-away event
+                #  log once per eyes-away event
                 currently_focused = False
                 print(f'[Gaze] Eyes away: {datetime.now().isoformat()}')
                 post('eyes_away')
@@ -63,7 +63,7 @@ while True:
                 post('focused')
 
     else:
-        # Face not detected
+        # face not detected
         display_text = 'No face detected'
         if currently_focused:
             currently_focused = False
