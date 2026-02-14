@@ -17,7 +17,7 @@ terminal :
 cd Desktop/filename  
 python3 -m venv venv  
 source venv/bin/activate  
-pip install -r requirements.txt  
+pip3 install -r requirements.txt  
 python3 app/server.py            
 - server runs at http://127.0.0.1:5000/
 
