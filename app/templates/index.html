@@ -1,0 +1,309 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Gaze — Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    /* Blue / Gray Apple-Health-like theme (light) */
+    :root{
+      --bg:#f5f8fc;
+      --card:#ffffff;
+      --accent:#4a90e2;
+      --accent-2:#7db9ff;
+      --muted:#7b8590;
+      --round:14px;
+      --shadow: 0 6px 18px rgba(30,40,60,0.06);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:#0b1220;}
+    .wrap{max-width:1040px;margin:28px auto;padding:18px;}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent-2),var(--accent));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;box-shadow:0 6px 20px rgba(74,144,226,0.18)}
+    h1{margin:0;font-size:20px}
+    .subtitle{color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    .card{background:var(--card);border-radius:var(--round);padding:16px;box-shadow:var(--shadow)}
+    .row{display:flex;gap:12px;align-items:center}
+    .stat{flex:1;padding:14px;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#f7fbff);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.02)}
+    .stat h3{margin:0;font-size:14px;color:var(--muted)}
+    .stat .num{font-weight:700;font-size:20px;margin-top:6px;color:#14212d}
+    .timeline{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .event{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;background:#fbfdff;border:1px solid #eef6ff}
+    .time{width:120px;color:var(--muted);font-size:13px}
+    .etype{font-weight:600}
+    .einfo{color:var(--muted);font-size:13px;margin-left:auto}
+    .small{font-size:13px;color:var(--muted)}
+    .btn{background:var(--accent);color:white;padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:600}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#f3f7fb;color:var(--muted);font-size:13px;border:1px solid #eaf3ff}
+    .controls{display:flex;gap:8px;align-items:center;margin-top:10px}
+    .right-col .card{position:sticky;top:18px}
+    input[type="text"]{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef8;background:#fbfdff}
+    .download{display:flex;gap:8px;align-items:center;margin-top:12px}
+    footer{text-align:center;color:var(--muted);font-size:13px;margin-top:18px}
+    /* Prevent long URLs from stretching cards */
+    .event {
+      max-width: 100%;
+    }
+
+    .einfo {
+      max-width: 100%;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+      .event {
+        flex-wrap: wrap;
+      }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">Gz</div>
+        <div>
+          <h1>Gaze</h1>
+          <div class="subtitle">Webcam + Tab focus monitor — local only</div>
+        </div>
+      </div>
+      <div id="welcome" class="small">Welcome</div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <strong style="font-size:16px">Today Summary</strong>
+              <div class="small" style="margin-top:4px">Quick overview of distraction events for today</div>
+            </div>
+            <div class="pill" id="lastUpdated">Updated: --</div>
+          </div>
+
+          <div style="margin-top:14px;display:flex;gap:12px">
+            <div class="stat">
+              <h3>Tab switches</h3>
+              <div class="num" id="cnt_tab">0</div>
+            </div>
+            <div class="stat">
+              <h3>Eyes away</h3>
+              <div class="num" id="cnt_eyes_away">0</div>
+            </div>
+            <div class="stat">
+              <h3>Face not detected</h3>
+              <div class="num" id="cnt_face">0</div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
+            <div class="small">You were distracted <strong id="cnt_total">0</strong> times today</div>
+            <div class="controls">
+              <button class="btn" id="downloadCSV">Export CSV</button>
+              <button class="btn" id="openTracker" style="background:#2c7be5">Open Tracker</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <strong>Recent events</strong>
+          <div class="small" style="margin-top:6px">A timeline of the most recent events</div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </main>
+
+      <aside class="right-col">
+        <div class="card">
+          <strong>Live Focus Status</strong>
+          <div class="small" style="margin-top:6px">Realtime webcam + tab monitoring</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+            <div id="statusDot" style="width:14px;height:14px;border-radius:50%;background:#cbd5db"></div>
+            <div><div id="statusText" style="font-weight:700">Loading...</div><div id="statusDetail" class="small">--</div></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <strong>Settings</strong>
+          <div class="small" style="margin-top:6px">Your name and focus domains</div>
+          <div style="margin-top:10px">
+            <label class="small">Your name</label>
+            <input id="username" type="text" placeholder="Optional (saved locally)" />
+            <label class="small" style="margin-top:10px">Focus domains (comma-separated)</label>
+            <input id="domains" type="text" placeholder="e.g., docs.google.com, canvas.instructure.com" />
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn" id="saveSettings">Save</button>
+              <button class="btn" id="clearLogs" style="background:#e64a19">Clear Logs</button>
+            </div>
+            <div class="small" style="margin-top:10px;color:var(--muted)">Tip: set the same domains in the browser extension options for live tab classification.</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px;text-align:center">
+          <strong>About Gaze</strong>
+          <div class="small" style="margin-top:8px">Local-first focus support for students and professionals. Data stays on your machine.</div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>Gaze • Local-only demo • Data saved to your computer</footer>
+  </div>
+
+  <script>
+    // ---------- UTIL ----------
+    function formatTime(iso){
+      try{
+        return new Date(iso).toLocaleString();
+      }catch(e){
+        return iso;
+      }
+    }
+
+    function parseCSVLine(line){
+      // split into 3 parts max: ts,event,info (info may contain commas)
+      const firstComma = line.indexOf(',');
+      const secondComma = line.indexOf(',', firstComma + 1);
+      if(firstComma === -1 || secondComma === -1) return null;
+
+      let ts = line.slice(0, firstComma).replace(/^"|"$/g,'').trim().split('.')[0];
+      let ev = line.slice(firstComma + 1, secondComma).trim();
+      let info = line.slice(secondComma + 1).replace(/^"|"$/g,'').trim();
+
+      return { ts, ev, info };
+    }
+
+    // ---------- USER ----------
+    async function initUser(){
+      const stored = localStorage.getItem('gaze_username') || '';
+      if(stored){
+        username.value = stored;
+        welcome.textContent = 'Welcome back, ' + stored;
+      }
+    }
+
+    // ---------- STATUS ----------
+    async function fetchStatus(){
+      try{
+        const r = await fetch('/status');
+        const j = await r.json();
+
+        statusDot.style.background = j.focused ? '#00c853' : '#ff3b30';
+        statusText.textContent = j.focused ? 'Focused' : 'Distracted';
+        statusDetail.textContent = j.detail || '--';
+
+        lastUpdated.textContent =
+          'Updated: ' + (j.last_updated ? new Date(j.last_updated).toLocaleString() : '--');
+      }catch(e){
+        console.log('fetchStatus error', e);
+      }
+    }
+
+    // ---------- EVENTS ----------
+    async function loadEvents(){
+      const user = username.value.trim() || 'default_user';
+
+      try{
+        const r = await fetch('/events/' + encodeURIComponent(user));
+        if(!r.ok){
+          timeline.innerHTML = '<div class="small">No events yet</div>';
+          cnt_tab.textContent = cnt_eyes_away.textContent =
+          cnt_face.textContent = cnt_total.textContent = '0';
+          return;
+        }
+
+        const text = await r.text();
+        const lines = text.trim().split('\n').slice(1).reverse(); // skip header
+
+        // today at local midnight
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        let tabCount = 0;
+        let eyesCount = 0;
+        let faceCount = 0;
+        const rows = [];
+
+        for(const line of lines){
+          const row = parseCSVLine(line);
+          if(!row) continue;
+
+          const tsDate = new Date(row.ts);
+          if(isNaN(tsDate)) continue;
+
+          // Count today's distractions
+          if(tsDate >= today){
+            switch(row.ev){
+              case 'tab_switch':
+                tabCount++;
+                break;
+              case 'eyes_away':
+                eyesCount++;
+                break;
+              case 'face_not_detected':
+                faceCount++;
+                break;
+            }
+          }
+
+          rows.push(row);
+        }
+
+        // render timeline (most recent first)
+        timeline.innerHTML = '';
+        rows.slice(0,50).forEach(r=>{
+          const el = document.createElement('div');
+          el.className = 'event';
+          el.innerHTML = `
+            <div class="time">${formatTime(r.ts)}</div>
+            <div class="etype">${r.ev.replace(/_/g,' ')}</div>
+            <div class="einfo">${r.info || ''}</div>
+          `;
+          timeline.appendChild(el);
+        });
+
+        // update dashboard numbers
+        cnt_tab.textContent = tabCount;
+        cnt_eyes_away.textContent = eyesCount;
+        cnt_face.textContent = faceCount;
+        cnt_total.textContent = tabCount + eyesCount + faceCount;
+
+      }catch(e){
+        console.log('loadEvents error', e);
+        timeline.innerHTML = '<div class="small">Error loading events</div>';
+      }
+    }
+
+
+    // ---------- CONTROLS ----------
+    saveSettings.onclick = ()=>{
+      if(username.value.trim())
+        localStorage.setItem('gaze_username', username.value.trim());
+      alert('Saved locally.');
+    };
+
+    downloadCSV.onclick = ()=>{
+      const user = username.value.trim() || 'default_user';
+      window.location = '/download_all/' + encodeURIComponent(user);
+    };
+
+    clearLogs.onclick = async ()=>{
+      if(!confirm('Clear logs for this user?')) return;
+      const user = username.value.trim() || 'default_user';
+      await fetch('/clear/' + encodeURIComponent(user), {method:'POST'});
+      loadEvents();
+    };
+
+    openTracker.onclick = ()=>{
+      alert('Run eye_tracker.py to stream webcam focus data.');
+    };
+
+    // ---------- INIT ----------
+    initUser();
+    fetchStatus();
+    loadEvents();
+    setInterval(()=>{ fetchStatus(); loadEvents(); }, 2500);
+  </script>
+
+</body>
+</html>

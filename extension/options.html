@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Gaze Options</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+      body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;margin:16px;background:#f3f7fb;color:#111}
+      h3{margin:0 0 8px 0}
+      .card{background:white;padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(20,30,60,0.06);margin-bottom:12px}
+      input[type="text"]{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef8;background:#fbfdff}
+      .row{display:flex;gap:8px;align-items:center;margin-top:10px}
+      label.small{font-size:13px;color:#6b7280}
+      .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+      .chip{padding:8px 10px;border-radius:999px;background:#f3f7fb;border:1px solid #e6eef8;cursor:pointer}
+      .chip.active{background:#e7f2ff;border-color:#cfe8ff}
+      .btn{padding:10px 12px;border-radius:10px;border:none;background:#2c7be5;color:white;cursor:pointer;font-weight:600}
+      .muted{font-size:13px;color:#6b7280;margin-top:8px}
+      .sectionTitle{font-weight:700;margin-top:12px}
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h3>Gaze Options</h3>
+      <div class="muted">Customize focus sites, blocked sites, and notifications.</div>
+
+      <div style="margin-top:10px">
+        <label class="small">Your name</label>
+        <input id="username" type="text" placeholder="Optional (default_user)" />
+      </div>
+
+      <!-- EXTENSION SETTINGS -->
+      <div class="sectionTitle">Extension Control</div>
+      <label class="row"><input type="checkbox" id="gaze_enabled"> Enable Gaze Tracking</label>
+
+      <div class="sectionTitle">Notification Settings</div>
+      <label class="row"><input type="checkbox" id="notify_tab_switch"> Tab switch alerts</label>
+      <label class="row"><input type="checkbox" id="notify_blocked_site"> Blocked site alerts</label>
+      <label class="row"><input type="checkbox" id="notify_eyes_away"> Eyes away alerts</label>
+      <label class="row"><input type="checkbox" id="notify_face_missing"> Face not detected alerts</label>
+      <label class="row"><input type="checkbox" id="notify_sound"> Play sound with notifications</label>
+
+      <!-- FOCUS -->
+      <div class="sectionTitle">Common focus sites</div>
+      <div class="presets" id="focusPresets"></div>
+      <div style="margin-top:8px">
+        <label class="small">Custom focus domains (comma separated)</label>
+        <input id="domains" type="text" placeholder="docs.google.com, canvas.instructure.com" />
+      </div>
+
+      <!-- BLOCKED -->
+      <div class="sectionTitle">Common blocked sites</div>
+      <div class="presets" id="blockedPresets"></div>
+      <div style="margin-top:8px">
+        <label class="small">Custom blocked domains (comma separated)</label>
+        <input id="blocked" type="text" placeholder="youtube.com, netflix.com" />
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button id="save" class="btn">Save</button>
+        <button id="reset" class="btn" style="background:#6b7280">Reset</button>
+      </div>
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>
