@@ -5,7 +5,7 @@ NEW FEATURES:
 
 
 FEATURES THAT NEED TO BE FIXED IN FUTURE:
-- Priority 1: reward system in Today Summary (ur focused for X minutes)
+- Priority 1: reward system in Today Summary (ur focused for X minutes) -- wont do in notifs cus thats prob just more distracting
 - nicer logo/design touches
 - lowk need a better sound thats not as annoying for ding.mp3
 
