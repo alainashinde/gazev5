@@ -40,7 +40,7 @@ def update():
     if not event:
         event = 'focused' if data.get('focused', True) else 'eyes_away'
 
-    # Update STATE for dashboard
+    # update STATE for dashboard
     if event == 'focused':
         STATE['focused'] = True
         STATE['detail'] = 'Focused'
@@ -56,10 +56,10 @@ def update():
 
     STATE['last_updated'] = datetime.now().isoformat()
 
-    # Log every event in CSV — critical
+    # log every event in CSV 
     log_event(username, event, '')
 
-    print(f'[Gaze] Logged {event} for {username}')  # <-- DEBUG
+    print(f'[Gaze] Logged {event} for {username}')  # <-- debug
 
     return jsonify({'ok': True})
 
